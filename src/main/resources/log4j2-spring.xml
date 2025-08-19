@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="LOG_DIR">./log</Property>
+        <Property name="MAX_FILE_SIZE">200MB</Property>
+        <Property name="MAX_AMOUNT_FILES">100</Property>
+    </Properties>
+
+    <Appenders>
+
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ISO8601}{black} [%highlight{%-5level }] [%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
+        </Console>
+
+        <RollingFile name="CrecheServerApplicationLog"
+                     fileName= "${LOG_DIR}/CrecheServerApplication.log"
+                     filePattern="${LOG_DIR}/CrecheServerApplication-%d{-dd-MMMM-yyyy}-%i.log.gz"
+                     append="true">
+            <PatternLayout>
+                <pattern>%d %p %C{1.} [%t] %m%n</pattern>
+            </PatternLayout>
+
+            <Policies>
+                <!-- rollover on startup, daily and when the file reaches
+                    10 MegaBytes -->
+                <!--OnStartupTriggeringPolicy /-->
+                <SizeBasedTriggeringPolicy  size="${MAX_FILE_SIZE}" />
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_AMOUNT_FILES}"/>
+        </RollingFile>
+
+        <RollingFile name="CrecheServerApplicationControllerLog"
+                     fileName= "${LOG_DIR}/CrecheServerApplicationController.log"
+                     filePattern="${LOG_DIR}/CrecheServerApplicationController-%d{-dd-MMMM-yyyy}-%i.log.gz"
+                     append="true">
+            <JsonLayout objectMessageAsJsonObject="true" >
+                <KeyValuePair key="timeMillis" value="$${date:yyyy-MM-dd'T'HH:mm:ss.SSSZ}" />
+                <KeyValuePair key="service" value="subscription" />
+            </JsonLayout>
+
+            <Policies>
+                <!-- rollover on startup, daily and when the file reaches
+                    10 MegaBytes -->
+                <!--OnStartupTriggeringPolicy /-->
+                <SizeBasedTriggeringPolicy  size="${MAX_FILE_SIZE}" />
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_AMOUNT_FILES}"/>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+        <!-- LOG everything at INFO level -->
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="CrecheServerApplicationLog" />
+        </Root>
+
+        <Logger name="za.co.creche_server" level="trace">
+            <AppenderRef ref="CrecheServerApplicationLog" />
+        </Logger>
+
+        <Logger name="CrecheServerApplicationControllerLogger" level="trace">
+            <AppenderRef ref="CrecheServerApplicationControllerLog" />
+        </Logger>
+    </Loggers>
+
+</Configuration>
