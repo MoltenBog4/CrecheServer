@@ -4,11 +4,21 @@ server:
 spring:
   autoconfigure:
     exclude:
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+#      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+#      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   data:
     rest:
       base-path: /api/entities
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+
+  datasource:
+      url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/postgres
+      username: ${DB_USERNAME:postgres}
+      password: ${DB_PASSWORD:password}
+      type: org.apache.tomcat.jdbc.pool.DataSource
+
+
+  logging:
+    config: classpath:log4j2-spring.xml
