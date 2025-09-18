@@ -2,23 +2,33 @@ server:
   port: 8086
 
 spring:
-  autoconfigure:
-    exclude:
-#      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-#      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-  data:
-    rest:
-      base-path: /api/entities
   mvc:
     pathmatch:
-      matching-strategy: ANT_PATH_MATCHER
+      matching-strategy: ANT_PATH_MATCHER  # fine for springdoc on SB 2.7
 
+  # --- DataSource (Hikari by default) ---
   datasource:
-      url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/postgres
-      username: ${DB_USERNAME:postgres}
-      password: ${DB_PASSWORD:password}
-      type: org.apache.tomcat.jdbc.pool.DataSource
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}?currentSchema=${DB_SCHEMA:creche}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+
+  # Not using JPA, but harmless to keep tidy
+  jpa:
+    open-in-view: false
+
+  # Optional: if you don’t use schema/data SQL files
+  sql:
+    init:
+      mode: never
+
+  # --- Mail (needed so JavaMailSender bean exists) ---
+  # Defaults target a local SMTP catcher like MailHog (localhost:1025).
+  # For real SMTP, override via env vars or replace below.
 
 
-  logging:
-    config: classpath:log4j2-spring.xml
+
+logging:
+  level:
+    org.springframework.jdbc.core: DEBUG
+    org.springframework.mail: INFO

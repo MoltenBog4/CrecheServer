@@ -1,62 +1,50 @@
 package za.co.creche_server.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import za.co.creche_server.model.Child;
-import za.co.creche_server.model.Parent;
+import za.co.creche_server.dto.ChildRegistrationRequest;
+import za.co.creche_server.dto.ChildResponse;
+import za.co.creche_server.dto.ParentRegistrationRequest;
+import za.co.creche_server.dto.ParentResponse;
 import za.co.creche_server.service.RegistrationService;
-import java.util.stream.Collectors;
-
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.time.LocalDate;
-import java.util.List;
 
 @RestController
-@RequestMapping("/creche_service/v1/registrations")
+@RequestMapping("/api")
+@RequiredArgsConstructor
 @Validated
 public class RegistrationController {
 
-    private final RegistrationService service;
+    private final RegistrationService registrationService;
 
-    public RegistrationController(RegistrationService service) { this.service = service; }
-
-    // ----------- Request DTOs (Javax Validation for Java 8) -----------
-
-    public static class ChildReq {
-        @NotBlank public String firstName;
-        @NotBlank public String lastName;
-
-        @NotNull @Past public LocalDate dateOfBirth;
-
-        public String medicalNotes;
+    /** Register a parent and one or more children in one request. */
+    @PostMapping("/registration/parent")
+    public ResponseEntity<ParentResponse> registerParent(
+            @Valid @RequestBody ParentRegistrationRequest request) {
+        return ResponseEntity.ok(registrationService.registerParentAndChildren(request));
     }
 
-    public static class RegistrationReq {
-        @NotBlank public String fullName;
-        @Email @NotBlank public String email;
-        @NotBlank @Size(min = 7, max = 20) public String phone;
-
-        @NotNull @Size(min = 1, message = "At least one child is required")
-        public List<@Valid ChildReq> children;
+    /** Get a parent with all their children. */
+    @GetMapping("/parents/{id}")
+    public ResponseEntity<ParentResponse> getParent(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(registrationService.getParentWithChildren(id));
     }
 
-    // ----------- Endpoint -----------
+    /** Add a new child to an existing parent. */
+    @PostMapping("/parents/{parentId}/children")
+    public ResponseEntity<ChildResponse> addChild(
+            @PathVariable("parentId") Long parentId,
+            @Valid @RequestBody ChildRegistrationRequest child) {
+        return ResponseEntity.ok(registrationService.addChild(parentId, child));
+    }
 
-    @PostMapping
-    public Parent register(@RequestBody @Valid RegistrationReq req) {
-        // Map ChildReq -> Child model (only fields used by service)
-
-        List<Child> kids = req.children.stream().map(cr -> {
-            Child c = new Child();
-            c.setFirstName(cr.firstName);
-            c.setLastName(cr.lastName);
-            c.setDateOfBirth(cr.dateOfBirth);
-            c.setMedicalNotes(cr.medicalNotes);
-            return c;
-        }).collect(Collectors.toList());
-
-        return service.registerParentWithChildren(req.fullName, req.email, req.phone, kids);
+    /** Delete a parent (children will be removed by FK cascade if configured). */
+    @DeleteMapping("/parents/{id}")
+    public ResponseEntity<Void> deleteParent(@PathVariable("id") Long id) {
+        registrationService.deleteParent(id);
+        return ResponseEntity.noContent().build();
     }
 }

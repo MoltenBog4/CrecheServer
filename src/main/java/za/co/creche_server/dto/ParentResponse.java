@@ -1,11 +1,13 @@
-package za.co.creche_server.model;
+package za.co.creche_server.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+
+import java.util.List;
 
 @Getter
-@Setter
-public class Parent {
+@AllArgsConstructor
+public class ParentResponse {
     private Long id;
     private String firstName;
     private String lastName;
@@ -13,4 +15,5 @@ public class Parent {
     private String cellNumber;
     private String email;
     private String address;
+    private List<ChildResponse> children;
 }
