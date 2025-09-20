@@ -13,20 +13,25 @@ spring:
     password: ${DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
 
-  # Not using JPA, but harmless to keep tidy
   jpa:
     open-in-view: false
 
-  # Optional: if you don’t use schema/data SQL files
   sql:
     init:
       mode: never
 
-  # --- Mail (needed so JavaMailSender bean exists) ---
-  # Defaults target a local SMTP catcher like MailHog (localhost:1025).
-  # For real SMTP, override via env vars or replace below.
-
-
+  # --- Mail (real Gmail SMTP settings) ---
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: manymenfa@gmail.com
+    password: igae egab tzxb fdva
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 logging:
   level:
