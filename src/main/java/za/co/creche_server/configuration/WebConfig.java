@@ -1,4 +1,4 @@
-package za.co.creche_server.config;
+package za.co.creche_server.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.*;
