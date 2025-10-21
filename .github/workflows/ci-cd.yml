@@ -2,9 +2,9 @@ name: Java CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]   # runs when you push to main
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]   # runs on PRs to main
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      # 2. Set up JDK (update version if needed)
+      # 2. Set up JDK (update if needed)
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -31,19 +31,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      # 4. Build & Test
+      # 4. Build project with Maven
       - name: Build with Maven
         run: mvn clean install -B
 
-      # 5. Run Unit Tests
+      # 5. Run tests
       - name: Run tests
         run: mvn test
 
-      # 6. Package JAR
+      # 6. Package JAR (skip tests to save time)
       - name: Package application
         run: mvn package -DskipTests
 
-      # 7. Upload JAR as artifact (downloadable from GitHub)
+      # 7. Upload JAR artifact
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
