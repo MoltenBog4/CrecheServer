@@ -15,12 +15,12 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      # 2. Set up JDK (update if needed)
+      # 2. Set up JDK 8
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: 'temurin'   # Eclipse Temurin (recommended)
+          java-version: '8'
 
       # 3. Cache Maven dependencies
       - name: Cache Maven packages
@@ -31,7 +31,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      # 4. Build project with Maven
+      # 4. Build with Maven
       - name: Build with Maven
         run: mvn clean install -B
 
@@ -39,7 +39,7 @@ jobs:
       - name: Run tests
         run: mvn test
 
-      # 6. Package JAR (skip tests to save time)
+      # 6. Package JAR (skip tests for speed)
       - name: Package application
         run: mvn package -DskipTests
 
